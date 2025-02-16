@@ -1,9 +1,9 @@
 
-# April - 我的世界恶搞Mod插件 🌟
+# April - 我的世界恶搞插件 🌟
 
 ![Version](https://img.shields.io/badge/版本-2025.1-blue?style=flat-square)
 ![Minecraft](https://img.shields.io/badge/适配版本-Paper1.21.X-success?style=flat-square)
-![License](https://img.shields.io/badge/许可证-MIT-green?style=flat-square)
+![License](https://img.shields.io/badge/许可证-GPL-green?style=flat-square)
 
 > **“让生存模式不再平凡！”**  
 > 一个专为《我的世界》服务器设计的恶搞性Mod，为游戏注入荒诞与挑战！
@@ -50,5 +50,5 @@
 
 ## 📜 开源协议
 
-本项目基于 **[MIT License](LICENSE)** 开源。  
+本项目基于 **[GPL v3 License](LICENSE)** 开源。  
 修改或分发时请保留版权声明。
