@@ -1,5 +1,5 @@
 name: April
-version: '1.0-SNAPSHOT'
+version: ${version}
 main: cn.mcsfs.april.April
 api-version: '1.21'
 load: STARTUP
