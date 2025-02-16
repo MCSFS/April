@@ -1,0 +1,11 @@
+name: April
+version: '1.0-SNAPSHOT'
+main: cn.mcsfs.april.April
+api-version: '1.21'
+load: STARTUP
+authors: [ SmailPang&Deepseek ]
+description: 用于在愚人节中让玩家有一些非常有意思的体验。
+commands:
+  aqk:
+    description: 查看个人欠款
+    usage: /aqk
