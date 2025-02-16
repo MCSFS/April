@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/badge/许可证-GPL-green?style=flat-square)
 
 > **“让生存模式不再平凡！”**  
-> 一个专为《我的世界》服务器设计的恶搞性Mod，为游戏注入荒诞与挑战！
+> 一个专为《我的世界》服务器设计的恶搞性，为游戏注入荒诞与挑战！
 
 ---
 
