@@ -1,18 +1,9 @@
-- name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
 plugins {
     id 'java'
 }
 
 group = 'cn.mcsfs'
-version = '1.0-SNAPSHOT'
-
-def getVersionName = {
-    def tag = System.getenv("GITHUB_REF") ?: "v1.0.0"
-    tag = tag.replace("refs/tags/v", "").replace("refs/tags/", "")
-    return tag
-}
+version = '2025.1'
 
 version = getVersionName()
 
@@ -62,4 +53,3 @@ processResources {
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:none"
 }
-
