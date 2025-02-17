@@ -3,9 +3,7 @@ plugins {
 }
 
 group = 'cn.mcsfs'
-version = '2025.1'
-
-version = getVersionName()
+version = '2025.2'
 
 repositories {
     mavenCentral()
@@ -17,10 +15,14 @@ repositories {
         name = "purpurmc"
         url = "https://repo.purpurmc.org/snapshots"
     }
+    maven {
+        url = 'https://repo.extendedclip.com/releases/'
+    }
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly 'me.clip:placeholderapi:2.11.6'
 }
 
 def targetJavaVersion = 21
