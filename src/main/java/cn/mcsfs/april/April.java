@@ -445,7 +445,7 @@ public class April extends JavaPlugin implements Listener {
     }
 
     // ==================== 节肢杀手附魔陷阱功能 ====================
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onArthropodAttack(EntityDamageByEntityEvent event) {
         // 检查攻击者是否为玩家
         if (event.getDamager() instanceof Player) {
@@ -455,12 +455,47 @@ public class April extends JavaPlugin implements Listener {
             // 检查武器是否带有节肢杀手附魔
             if (weapon != null && weapon.containsEnchantment(Enchantment.BANE_OF_ARTHROPODS)) {
                 // 检查被攻击者是否为节肢生物
-                if (isArthropod(event.getEntityType())) {
-                    // 在玩家周围生成蜘蛛网
+                if (isArthropod(event.getEntityType()) && event.getEntity() instanceof LivingEntity) {
+                    LivingEntity target = (LivingEntity) event.getEntity();
+
+                    // 保存原始生命值
+                    double originalHealth = target.getHealth();
+
+                    // 强制设置伤害为1点（触发生物仇恨）
+                    event.setDamage(1.0);
+
+                    // 在生物位置生成绿色粒子效果
+                    spawnGreenParticles(target);
+
+                    // 在事件处理后立即恢复生命值
+                    Bukkit.getScheduler().runTaskLater(this, () -> {
+                        // 检查生物是否仍然存活
+                        if (!target.isDead()) {
+                            double currentHealth = target.getHealth();
+                            // 如果生物没有其他伤害来源，恢复到原始生命值
+                            if (currentHealth <= originalHealth) {
+                                target.setHealth(originalHealth);
+                            }
+                        }
+                    }, 1L); // 延迟1tick执行
+
+                    // 生成蜘蛛网陷阱
                     generateWebTrap(player);
                 }
             }
         }
+    }
+
+    // 生成绿色粒子效果
+    private void spawnGreenParticles(LivingEntity entity) {
+        Location loc = entity.getLocation().add(0, 1, 0); // 在生物中心位置
+        entity.getWorld().spawnParticle(
+                Particle.HAPPY_VILLAGER,  // 使用村民高兴的绿色粒子
+                loc,
+                15,  // 数量
+                0.5, 0.5, 0.5, // 偏移量
+                0.1  // 额外参数
+        );
     }
 
     // 判断生物类型是否为节肢生物
@@ -471,14 +506,14 @@ public class April extends JavaPlugin implements Listener {
     // 生成蜘蛛网陷阱
     private void generateWebTrap(Player player) {
         Random rand = new Random();
-        int webCount = rand.nextInt(5) + 2; // 生成2-5个蜘蛛网
+        int webCount = rand.nextInt(9) + 6; // 生成6-9个蜘蛛网
 
         for (int i = 0; i < webCount; i++) {
             // 获取玩家周围1-2格内的随机位置
             Location loc = player.getLocation().clone()
-                    .add(rand.nextInt(3)-1,  // X轴偏移 (-1~1)
+                    .add(rand.nextInt(2)-1,  // X轴偏移 (-1~1)
                             rand.nextInt(2),    // Y轴偏移 (0~1)
-                            rand.nextInt(3)-1); // Z轴偏移 (-1~1)
+                            rand.nextInt(2)-1); // Z轴偏移 (-1~1)
 
             // 确保目标位置是空气或可替换方块
             Block targetBlock = loc.getBlock();
