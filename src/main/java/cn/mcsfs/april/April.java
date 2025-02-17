@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 import java.util.*;
 
@@ -55,11 +56,57 @@ public class April extends JavaPlugin implements Listener {
         });
 
         getCommand("aqk").setExecutor(new DebtCommandExecutor()); // 添加命令注册
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new DebtPlaceholder(this).register();
+            getLogger().info("已挂钩PlaceholderAPI");
+        }
     }
 
     @Override
     public void onDisable() {
         getLogger().info("2025愚人节插件已禁用！");
+    }
+
+    //==================== 添加PlaceholderAPI支持 ====================
+    // 添加获取总欠款的方法（供PlaceholderAPI调用）
+    public int getTotalDebt(UUID uuid) {
+        return debtMap.getOrDefault(uuid, Collections.emptyMap())
+                .values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    // 添加PlaceholderAPI扩展类
+    private class DebtPlaceholder extends PlaceholderExpansion {
+        private final April plugin;
+
+        public DebtPlaceholder(April plugin) {
+            this.plugin = plugin;
+        }
+
+        @Override
+        public String getIdentifier() {
+            return "aqk";
+        }
+
+        @Override
+        public String getAuthor() {
+            return "你的名字";
+        }
+
+        @Override
+        public String getVersion() {
+            return plugin.getDescription().getVersion();
+        }
+
+        @Override
+        public String onPlaceholderRequest(Player player, String identifier) {
+            if (player == null) return "0";
+
+            if (identifier.equalsIgnoreCase("player_aqk")) {
+                return String.valueOf(plugin.getTotalDebt(player.getUniqueId()));
+            }
+            return null;
+        }
     }
 
     //==================== 欠款计分板 ====================
@@ -149,7 +196,7 @@ public class April extends JavaPlugin implements Listener {
         // 收集所有玩家的总欠款
         Map<String, Integer> totalDebts = new HashMap<>();
         for (Map.Entry<UUID, Map<Material, Integer>> entry : debtMap.entrySet()) {
-            int total = entry.getValue().values().stream().mapToInt(Integer::intValue).sum();
+            int total = getTotalDebt(entry.getKey()); // 使用新方法
             if (total > 0) {
                 Player player = Bukkit.getPlayer(entry.getKey());
                 String name = (player != null) ? player.getName() :
