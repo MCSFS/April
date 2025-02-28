@@ -1,5 +1,5 @@
 name: April
-version: '2025.2_fix'
+version: '2025.3'
 main: cn.mcsfs.april.April
 api-version: '1.21'
 load: STARTUP
