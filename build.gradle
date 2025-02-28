@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'cn.mcsfs'
-version = '2025.2_fix'
+version = '2025.3'
 
 repositories {
     mavenCentral()
