@@ -37,6 +37,9 @@ import java.util.*;
 
 public class April extends JavaPlugin implements Listener {
 
+    // 添加提示开关状态
+    private boolean notificationsEnabled = true;
+
     // 存储玩家欠款数据：玩家UUID -> (物品类型 -> 欠款数量)
     private final Map<UUID, Map<Material, Integer>> debtMap = new HashMap<>();
     private final Random random = new Random();
@@ -67,6 +70,16 @@ public class April extends JavaPlugin implements Listener {
     public void onDisable() {
         getLogger().info("2025愚人节插件已禁用！");
     }
+
+    // 添加状态控制方法
+    public boolean areNotificationsEnabled() {
+        return notificationsEnabled;
+    }
+
+    public void setNotificationsEnabled(boolean enabled) {
+        this.notificationsEnabled = enabled;
+    }
+
 
     //==================== 添加PlaceholderAPI支持 ====================
     // 添加获取总欠款的方法（供PlaceholderAPI调用）
@@ -113,6 +126,22 @@ public class April extends JavaPlugin implements Listener {
     private class DebtCommandExecutor implements CommandExecutor {
         @Override
         public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+            // 处理 start/stop 子命令
+            if (args.length > 0) {
+                if (args[0].equalsIgnoreCase("start") || args[0].equalsIgnoreCase("stop")) {
+                    if (!sender.hasPermission("april.admin")) {
+                        sender.sendMessage(ChatColor.RED + "你没有权限使用此命令！");
+                        return true;
+                    }
+
+                    boolean enable = args[0].equalsIgnoreCase("start");
+                    setNotificationsEnabled(enable);
+                    sender.sendMessage(ChatColor.GREEN + "系统提示已" + (enable ? "开启" : "关闭"));
+                    return true;
+                }
+            }
+
+            // 原有显示欠款逻辑
             if (!(sender instanceof Player)) {
                 sender.sendMessage(ChatColor.RED + "只有玩家可以使用此命令");
                 return true;
@@ -121,16 +150,13 @@ public class April extends JavaPlugin implements Listener {
             Player player = (Player) sender;
             UUID uuid = player.getUniqueId();
 
-            if (!debtMap.containsKey(uuid)) {
+            // 检查是否有欠款记录
+            if (!debtMap.containsKey(uuid) || debtMap.get(uuid) == null || debtMap.get(uuid).isEmpty()) {
                 player.sendMessage(ChatColor.GREEN + "你当前没有任何欠款");
                 return true;
             }
 
             Map<Material, Integer> debts = debtMap.get(uuid);
-            if (debts.isEmpty()) {
-                player.sendMessage(ChatColor.GREEN + "你当前没有任何欠款");
-                return true;
-            }
 
             // 构建欠款信息
             StringBuilder message = new StringBuilder();
@@ -410,7 +436,9 @@ public class April extends JavaPlugin implements Listener {
                 public void run() {
                     int newFood = Math.max(0, player.getFoodLevel() - value * 2);
                     player.setFoodLevel(newFood);
-                    player.sendMessage("§c进食消耗了" + (value * 2) + "点饱食度");
+                    if (areNotificationsEnabled()) {
+                        player.sendMessage("§c进食消耗了" + (value * 2) + "点饱食度");
+                    }
                 }
             }.runTaskLater(this, 1);
         }
@@ -531,7 +559,9 @@ public class April extends JavaPlugin implements Listener {
         }
 
         // 提示玩家
-        player.sendMessage("§c节肢生物的粘液困住了你！");
+        if (areNotificationsEnabled()) {
+            player.sendMessage("§c节肢生物的粘液困住了你！");
+        }
     }
 
 // ==================== 下雨时燃烧伤害功能 ====================
@@ -636,7 +666,9 @@ public class April extends JavaPlugin implements Listener {
                     }
 
                     // 提示玩家
-                    player.sendMessage("§a你攻击了" + entityType.name() + "，并召唤了" + count + "只相同的生物！");
+                    if (areNotificationsEnabled()) {
+                        player.sendMessage("§a你攻击了" + entityType.name() + "，并召唤了" + count + "只相同的生物！");
+                    }
                 }
             }
         }
@@ -802,6 +834,8 @@ public class April extends JavaPlugin implements Listener {
                 return Material.LAPIS_LAZULI;
             case NETHER_GOLD_ORE:
                 return Material.GOLD_NUGGET;
+            case NETHER_QUARTZ_ORE:
+                return Material.QUARTZ;
             case ANCIENT_DEBRIS:
                 return Material.ANCIENT_DEBRIS;
             case REDSTONE_ORE:
@@ -850,6 +884,8 @@ public class April extends JavaPlugin implements Listener {
                 return "红石";
             case RAW_COPPER:
                 return "粗铜";
+            case QUARTZ:
+                return "下界石英";
             default:
                 return type.toString();
         }
